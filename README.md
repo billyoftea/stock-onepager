@@ -2,7 +2,7 @@
 
 一键生成美观、交互式的股票研究 One-Pager（HTML 格式），支持 **美股 / A股 / 港股**。
 
-**[查看 NVIDIA (NVDA) 示例 →](https://htmlpreview.github.io/?https://raw.githubusercontent.com/billyoftea/stock-onepager/master/examples/NVDA_onepager.html)**
+**[查看 NVIDIA (NVDA) 示例 →](https://billyoftea.github.io/stock-onepager/examples/NVDA_onepager.html)**
 
 ## 功能
 
