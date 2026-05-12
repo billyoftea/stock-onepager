@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{COMPANY_NAME}} ({{TICKER}}) — 投资研究</title>
+<style>
+  :root {
+    --navy: #1a2744;
+    --blue: #2c5f8a;
+    --light-bg: #f7f8fa;
+    --border: #e0e3e8;
+    --text: #2d3436;
+    --text-secondary: #636e72;
+    --green: #107c41;
+    --red: #c0392b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+    color: var(--text);
+    background: #e8ecf1;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 1100px;
+    margin: 20px auto;
+    background: #fff;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    background: var(--navy);
+    color: #fff;
+    padding: 28px 36px 24px;
+  }
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .header .ticker {
+    font-size: 14px;
+    font-weight: 400;
+    color: #8ba4c7;
+    margin-left: 8px;
+  }
+  .header .meta {
+    font-size: 13px;
+    color: #b0c4de;
+    margin-top: 4px;
+  }
+  .header .meta span { margin-right: 18px; }
+
+  /* Key metric cards in header */
+  .metric-cards {
+    display: flex;
+    gap: 16px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+  .metric-card {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    padding: 12px 18px;
+    min-width: 130px;
+    flex: 1;
+  }
+  .metric-card .label {
+    font-size: 11px;
+    color: #8ba4c7;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 4px;
+  }
+  .metric-card .value {
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .metric-card .sub {
+    font-size: 11px;
+    color: #8ba4c7;
+    margin-top: 2px;
+  }
+
+  /* ===== BODY ===== */
+  .body {
+    padding: 28px 36px 20px;
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px 32px;
+    margin-bottom: 24px;
+  }
+
+  .section {
+    margin-bottom: 24px;
+  }
+  .section.full { grid-column: 1 / -1; }
+
+  .section-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--navy);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title .icon {
+    font-size: 16px;
+  }
+
+  /* ===== DATA TABLE ===== */
+  table.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  table.data-table th {
+    background: var(--light-bg);
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-align: right;
+    padding: 6px 10px;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  table.data-table th:first-child {
+    text-align: left;
+    color: var(--navy);
+    font-weight: 700;
+  }
+  table.data-table td {
+    text-align: right;
+    padding: 5px 10px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  table.data-table td:first-child {
+    text-align: left;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+  table.data-table .highlight-row td {
+    font-weight: 700;
+    background: #fafbfc;
+  }
+  table.data-table .pos { color: var(--green); }
+  table.data-table .neg { color: var(--red); }
+
+  /* ===== SEGMENT BARS ===== */
+  .segment-list { list-style: none; }
+  .segment-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 12px;
+  }
+  .segment-name {
+    width: 120px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .segment-bar-wrap {
+    flex: 1;
+    height: 20px;
+    background: var(--light-bg);
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 0 10px;
+  }
+  .segment-bar {
+    height: 100%;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+    font-size: 10px;
+    color: #fff;
+    font-weight: 600;
+    min-width: fit-content;
+  }
+  .segment-value { width: 80px; text-align: right; font-weight: 600; flex-shrink: 0; }
+
+  /* ===== PE SPARKLINE ROW ===== */
+  .pe-history {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 60px;
+    margin-bottom: 8px;
+  }
+  .pe-bar {
+    flex: 1;
+    background: var(--blue);
+    border-radius: 2px 2px 0 0;
+    opacity: 0.6;
+    min-width: 8px;
+    position: relative;
+  }
+  .pe-bar.current {
+    opacity: 1;
+    background: var(--navy);
+  }
+  .pe-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+  }
+
+  /* ===== RISK / CATALYST ===== */
+  .rc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .rc-col h4 {
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .rc-col.risks h4 { color: var(--red); }
+  .rc-col.catalysts h4 { color: var(--green); }
+
+  .rc-item {
+    font-size: 12px;
+    margin-bottom: 8px;
+    padding-left: 14px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .rc-item::before {
+    position: absolute;
+    left: 0;
+    font-weight: 700;
+  }
+  .risks .rc-item::before { content: "—"; color: var(--red); }
+  .catalysts .rc-item::before { content: "+"; color: var(--green); }
+
+  /* ===== INVESTMENT FRAMEWORK ===== */
+  .framework-item {
+    margin-bottom: 14px;
+  }
+  .framework-item .fw-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 3px;
+  }
+  .framework-item .fw-text {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  /* ===== FOOTER ===== */
+  .footer {
+    background: var(--light-bg);
+    padding: 14px 36px;
+    font-size: 10px;
+    color: var(--text-secondary);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* ===== PRINT ===== */
+  @media print {
+    body { background: #fff; }
+    .page {
+      max-width: none;
+      margin: 0;
+      box-shadow: none;
+      page-break-after: avoid;
+    }
+    .header { padding: 20px 28px 18px; }
+    .body { padding: 20px 28px 16px; }
+    table.data-table { font-size: 10px; }
+  }
+
+  @media (max-width: 800px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .metric-cards { gap: 8px; }
+    .metric-card { min-width: 100px; padding: 10px 12px; }
+    .header { padding: 20px 18px 16px; }
+    .body { padding: 16px 18px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ====== HEADER ====== -->
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <h1>{{COMPANY_NAME}}<span class="ticker">{{TICKER}}</span></h1>
+        <div class="meta">
+          <span>市场: {{MARKET}}</span>
+          <span>行业: {{INDUSTRY}}</span>
+          <span>货币: {{CURRENCY}}</span>
+        </div>
+      </div>
+    </div>
+    <div class="metric-cards">
+      <div class="metric-card">
+        <div class="label">当前股价</div>
+        <div class="value">{{PRICE}}</div>
+        <div class="sub">{{PRICE_CHANGE}}</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">市值</div>
+        <div class="value">{{MARKET_CAP}}</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">PE (TTM)</div>
+        <div class="value">{{PE_TTM}}</div>
+        <div class="sub">历史中位: {{PE_MEDIAN}}</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">{{LATEST_YEAR}} 收入</div>
+        <div class="value">{{LATEST_REVENUE}}</div>
+        <div class="sub">增速: {{REVENUE_GROWTH}}</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">{{LATEST_YEAR}} 净利率</div>
+        <div class="value">{{NET_MARGIN}}</div>
+        <div class="sub">毛利: {{GROSS_MARGIN}}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== BODY ====== -->
+  <div class="body">
+
+    <div class="grid-2">
+
+      <!-- 模块1: 业务拆解 -->
+      <div class="section">
+        <div class="section-title"><span class="icon">1</span> 业务拆解</div>
+        <p style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;">{{BUSINESS_DESC}}</p>
+        <ul class="segment-list">
+          {{SEGMENT_ROWS}}
+        </ul>
+      </div>
+
+      <!-- 模块2: 估值定位 -->
+      <div class="section">
+        <div class="section-title"><span class="icon">2</span> 估值定位</div>
+        <div class="pe-labels">
+          <span>{{PE_START_YEAR}}</span><span>{{PE_MID_YEAR}}</span><span>当前</span>
+        </div>
+        <div class="pe-history">
+          {{PE_BARS}}
+        </div>
+        <table class="data-table" style="margin-top:8px;">
+          <tr><td>PE 区间 (5年)</td><td>{{PE_LOW}} — {{PE_HIGH}}</td></tr>
+          <tr><td>PE 历史中位</td><td>{{PE_MEDIAN}}</td></tr>
+          <tr><td>PE 当前</td><td><strong>{{PE_TTM}}</strong></td></tr>
+          <tr><td>PE 分位数</td><td>处于 {{PE_PERCENTILE}} 分位</td></tr>
+          <tr><td>P/B</td><td>{{PB}}</td></tr>
+          <tr><td>P/S</td><td>{{PS}}</td></tr>
+        </table>
+      </div>
+
+      <!-- 模块3: 财务核心 -->
+      <div class="section">
+        <div class="section-title"><span class="icon">3</span> 财务核心</div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>指标 ({{CURRENCY_UNIT}})</th>
+              {{FIN_HEADERS}}
+            </tr>
+          </thead>
+          <tbody>
+            {{FIN_ROWS}}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 模块4: 投资框架 -->
+      <div class="section">
+        <div class="section-title"><span class="icon">4</span> 投资框架</div>
+        {{FRAMEWORK_ITEMS}}
+      </div>
+
+    </div> <!-- /.grid-2 -->
+
+    <!-- 模块5 & 6: 风险 + 催化剂 (全宽) -->
+    <div class="section full">
+      <div class="section-title"><span class="icon">5</span> 风险 & 催化剂</div>
+      <div class="rc-grid">
+        <div class="rc-col risks">
+          <h4>下行风险</h4>
+          {{RISK_ITEMS}}
+        </div>
+        <div class="rc-col catalysts">
+          <h4>上行催化剂</h4>
+          {{CATALYST_ITEMS}}
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ====== FOOTER ====== -->
+  <div class="footer">
+    <span>数据来源: {{DATA_SOURCES}}</span>
+    <span>生成时间: {{GEN_TIME}}</span>
+    <span>⚠ 仅供参考，不构成投资建议</span>
+  </div>
+
+</div>
+
+</body>
+</html>
